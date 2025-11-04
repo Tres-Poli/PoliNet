@@ -1,0 +1,19 @@
+{
+    "name": "Runtime.Ecs",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:e59bf9fc7d5a44b18a819a92edd46163",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+        "GUID:fb03653a2a01461199fad8c8a9b4deb3"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
