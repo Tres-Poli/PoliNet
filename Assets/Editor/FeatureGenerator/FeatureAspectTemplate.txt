@@ -1,0 +1,9 @@
+namespace $NAMESPACE$
+{
+    using EcsSource;
+    using Leopotam.EcsLite;
+
+    public sealed class $FEATURE_NAME$Aspect : IEcsAspect
+    {
+    }
+}

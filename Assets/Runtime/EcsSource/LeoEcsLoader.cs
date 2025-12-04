@@ -3,10 +3,10 @@
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using Boot;
     using Cysharp.Threading.Tasks;
     using EcsSource;
     using Leopotam.EcsLite;
+    using Poli.Boot;
     using UnityEngine;
     using VContainer;
     using VContainer.Unity;

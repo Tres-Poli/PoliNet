@@ -1,0 +1,13 @@
+namespace $NAMESPACE$
+{
+    using EcsSource;
+    using LeoEcs;
+    
+    public class $FEATURE_NAME$Feature : IEcsFeature
+    {
+        public void InitializeFeature(IEcsSystems systems)
+        {
+            
+        }
+    }
+}

@@ -7,12 +7,35 @@
       "dependencies": {},
       "hash": "73a63b7f672b88f7e9992f6917eb458a8cbb6fa9"
     },
+    "com.github-glitchenzo.nugetforunity": {
+      "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "34432703a177c97631a4eb1d908f086037c67969"
+    },
+    "com.github.messagepack-csharp": {
+      "version": "https://github.com/MessagePack-CSharp/MessagePack-CSharp.git?path=src/MessagePack.UnityClient/Assets/Scripts/MessagePack",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "39e4a792100d19e7da6ed42ff12b3bc21aac28e8"
+    },
     "com.leoecscommunity.ecslite": {
       "version": "https://github.com/LeoECSCommunity/ecslite.git",
       "depth": 0,
       "source": "git",
       "dependencies": {},
       "hash": "50426caebffc4aec7a6a9c71b9c9bdd579aa45a1"
+    },
+    "com.poli.boot": {
+      "version": "https://github.com/Tres-Poli/PoliBoot.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "jp.hadashikick.vcontainer": "1.17.0"
+      },
+      "hash": "ce2578be6bb61801a5015e7b26b3ea430ee9dca7"
     },
     "com.unity.addressables": {
       "version": "2.7.4",
@@ -252,11 +275,11 @@
       "url": "https://packages.unity.com"
     },
     "jp.hadashikick.vcontainer": {
-      "version": "https://github.com/hadashiA/VContainer.git?path=VContainer/Assets/VContainer#1.17.0",
-      "depth": 0,
-      "source": "git",
+      "version": "1.17.0",
+      "depth": 1,
+      "source": "registry",
       "dependencies": {},
-      "hash": "177dbda557fd652ce7f5d1647a3621653e094373"
+      "url": "https://package.openupm.com"
     },
     "net.tomweiland.riptide": {
       "version": "https://github.com/RiptideNetworking/Riptide.git?path=/Packages/Core#2.2.1",

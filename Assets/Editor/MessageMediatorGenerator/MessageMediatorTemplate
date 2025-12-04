@@ -1,0 +1,1 @@
+﻿public sealed class $MEDIATOR_NAME$Mediator : MessageMediatorBase<$MEDIATOR_NAME$>{}
