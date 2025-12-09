@@ -12,4 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 90a7f157cf084d6c8bca0035b668c1f1, type: 3}
   m_Name: NetworkClientLoader
   m_EditorClassIdentifier: Runtime.Networking::Runtime.Networking.Loaders.NetworkClientLoader
-  config: {fileID: 11400000, guid: dd853f50417b64841bf5234d47469f16, type: 2}
+  _networkConfig: {fileID: 11400000, guid: dd853f50417b64841bf5234d47469f16, type: 2}
+  _networkMessageConfig: {fileID: 11400000, guid: 30b5091bef21b584d8b15962a43d7338, type: 2}

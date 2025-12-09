@@ -7,7 +7,7 @@
     using UnityEngine;
     
 #if UNITY_EDITOR
-    using MessagePack;
+    using Riptide;
     using UnityEditor;
     using Sirenix.OdinInspector;
 #endif
@@ -19,7 +19,6 @@
         private RuntimeNetworkMessageConfigEntry[] _assembledMapByKey;
         
         public List<NetworkMessageConfigEntry> Entries = new();
-        public int MessageTypeBytes => 2;
 
         public Dictionary<Type, RuntimeNetworkMessageConfigEntry> MapByType()
         {
@@ -62,29 +61,28 @@
         {
             Entries.Clear();
             
-            var messageTypes = TypeCache.GetTypesWithAttribute<MessagePackObjectAttribute>();
+            var messageTypes = TypeCache.GetTypesDerivedFrom<IMessageSerializable>();
             var mediators = TypeCache.GetTypesDerivedFrom<IMessageMediator>();
-            
-            try
+
+            for (int i = 0; i < messageTypes.Count; i++)
             {
-                checked
+                var messageType = messageTypes[i];
+                var mediatorType = mediators.FirstOrDefault(x =>
                 {
-                    for (int i = 0; i < messageTypes.Count; i++)
+                    if (x.BaseType == null)
                     {
-                        var messageType = messageTypes[i];
-                        var mediatorType = mediators.FirstOrDefault(x => x.GenericTypeArguments.Length > 0 && x.GenericTypeArguments[0] == messageType);
-                        Entries.Add(new NetworkMessageConfigEntry
-                        {
-                            Key = (UInt16)i,
-                            Type = new SerializableType(messageType),
-                            MediatorType = new SerializableType(mediatorType)
-                        });
+                        return false;
                     }
-                }
-            }
-            catch (OverflowException ex)
-            {
-                Debug.LogError(ex);
+
+                    return x.BaseType.GetGenericArguments().Contains(messageType);
+                });
+                
+                Entries.Add(new NetworkMessageConfigEntry
+                {
+                    Key = (UInt16)i,
+                    Type = new SerializableType(messageType),
+                    MediatorType = new SerializableType(mediatorType)
+                });
             }
             
             AssetDatabase.SaveAssets();
@@ -96,14 +94,14 @@
     [Serializable]
     public struct NetworkMessageConfigEntry
     {
-        public UInt16 Key;
+        public ushort Key;
         public SerializableType Type;
         public SerializableType MediatorType;
     }
 
     public struct RuntimeNetworkMessageConfigEntry
     {
-        public UInt16 Key;
+        public ushort Key;
         public Type Type;
         public Type MediatorType;
     }

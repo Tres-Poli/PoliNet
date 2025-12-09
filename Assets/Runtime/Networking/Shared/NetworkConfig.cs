@@ -2,7 +2,7 @@
 {
     using UnityEngine;
 
-    [CreateAssetMenu(menuName = "PoliNet/Configs/NetworkConfig", fileName = "NetworkConfig")]
+    [CreateAssetMenu(menuName = "Poli/Configs/NetworkConfig", fileName = "NetworkConfig")]
     public class NetworkConfig : ScriptableObject
     {
         public string address = "127.0.0.1";

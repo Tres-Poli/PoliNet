@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28bb99ae897042069e0aae618bc92d8a, type: 3}
+  m_Name: PoliNetBootConfig
+  m_EditorClassIdentifier: Runtime.Boot::Runtime.Boot.PoliNetBootConfig
+  _networkType: 3
+  _common:
+    loaders:
+    - {fileID: 11400000, guid: 4b9aebddb622b7941b4a6787f7ec49c8, type: 2}
+  _client:
+    loaders:
+    - {fileID: 11400000, guid: 9a299cd300b4f834ab73b37483d43eb2, type: 2}
+  _server:
+    loaders:
+    - {fileID: 11400000, guid: 4b9aebddb622b7941b4a6787f7ec49c8, type: 2}

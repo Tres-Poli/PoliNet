@@ -11,7 +11,7 @@
     using VContainer;
     using VContainer.Unity;
 
-    [CreateAssetMenu(menuName = "PoliNet/Loaders/LeoEcsLoader", fileName = "LeoEcsLoader")]
+    [CreateAssetMenu(menuName = "Poli/Loaders/LeoEcsLoader", fileName = "LeoEcsLoader")]
     public sealed class LeoEcsLoader : ScriptableLoader
     {
         [SerializeField]

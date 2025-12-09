@@ -1,0 +1,21 @@
+{
+    "name": "Runtime.Application.Server",
+    "rootNamespace": "",
+    "references": [
+        "GUID:4a51aae482474879b0ccde3c2ed8cf69",
+        "GUID:560b04d1a97f54a4e82edc0cbbb69285",
+        "GUID:3c59972f971d4a55ae881cf5e613da0b",
+        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc",
+        "GUID:bc1e27634b7645a5934427845a484280"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

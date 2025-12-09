@@ -4,7 +4,7 @@
     using Shared;
     using UnityEngine;
 
-    [CreateAssetMenu(menuName = "PoliNet/Cache/EcsFeatures", fileName = "EcsFeatures")]
+    [CreateAssetMenu(menuName = "Poli/Cache/EcsFeatures", fileName = "EcsFeatures")]
     public class EcsFeaturesCached : ScriptableObject
     {
         [SerializeField]

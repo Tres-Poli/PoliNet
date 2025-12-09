@@ -15,12 +15,14 @@ MonoBehaviour:
   Entries:
   - Key: 0
     Type:
-      referenceValue: Runtime.Networking.Shared.Messages.TestMessage, Networking.Shared
-    Mediator:
-      rid: 7228805232621518916
-  references:
-    version: 2
-    RefIds:
-    - rid: 7228805232621518916
-      type: {class: TestMessageMediator, ns: Runtime.Networking.MessageMediators, asm: Runtime.Networking}
-      data: 
+      referenceValue: Runtime.Networking.Shared.Messages.GetTimeResponseMessage,
+        Networking.Shared
+    MediatorType:
+      referenceValue: Runtime.Networking.Generated.GetTimeResponseMessageMediator,
+        Runtime.Networking
+  - Key: 1
+    Type:
+      referenceValue: Runtime.Networking.Shared.Messages.GetTimeRequestMessage, Networking.Shared
+    MediatorType:
+      referenceValue: Runtime.Networking.Generated.GetTimeRequestMessageMediator,
+        Runtime.Networking

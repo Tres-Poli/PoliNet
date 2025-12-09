@@ -2,7 +2,7 @@ namespace Runtime.Networking.Generated
 {
     using Shared.Messages;
     
-    public sealed class TestMessage2Mediator : MessageMediatorBase<TestMessage2>{}
-	public sealed class TestMessageMediator : MessageMediatorBase<TestMessage>{}
+    public sealed class GetTimeRequestMessageMediator : MessageMediatorBase<GetTimeRequestMessage>{}
+	public sealed class GetTimeResponseMessageMediator : MessageMediatorBase<GetTimeResponseMessage>{}
 	
 }

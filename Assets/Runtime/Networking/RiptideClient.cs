@@ -1,72 +1,92 @@
 ﻿namespace Runtime.Networking
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using Cysharp.Threading.Tasks;
-    using MessagePack;
     using Riptide;
     using Shared;
+    using Shared.Messages;
+    using UnityEngine;
 
-    public sealed class RiptideClient : MessageProvider, INetworkClient
+    public sealed class RiptideClient : INetworkClient
     {
-        private readonly NetworkConfig _config;
-        private readonly NetworkMessageConfig _networkMessageConfig;
+        private readonly MessageProvider _messageProvider;
+        private readonly MessageTypeProvider _messageTypeProvider;
+        private readonly NetworkConfig _networkConfig; 
         private readonly Client _client;
 
         private CancellationTokenSource _cts;
-        private Byte[] _inMessageCache;
 
-        private Dictionary<Type, RuntimeNetworkMessageConfigEntry> _messageMapByType;
+        private IDisposable _syncTimeSubscription;
+        private float _syncTimestamp;
+        private float _serverTime = -1f;
+        
+        public bool IsConnected => _client.IsConnected;
 
-        public RiptideClient(NetworkConfig config, NetworkMessageConfig  networkMessageConfig) : base(networkMessageConfig)
+        public float ServerTime => _serverTime > 0
+            ? _serverTime + (Time.unscaledTime - _syncTimestamp)
+            : -1f;
+
+        public RiptideClient(MessageProvider messageProvider, MessageTypeProvider messageTypeProvider, NetworkConfig networkConfig)
         {
-            _config = config;
-            _networkMessageConfig = networkMessageConfig;
+            _messageProvider = messageProvider;
+            _messageTypeProvider = messageTypeProvider;
+            _networkConfig = networkConfig;
             
             _client = new Client();
-            _inMessageCache = new Byte[1024];
-            _messageMapByType = _networkMessageConfig.MapByType();
         }
         
-        public override void Dispose()
+        public void Dispose()
         {
-            base.Dispose();
+            _client.MessageReceived -= MessageReceived_Callback;
+            _client.Connected -= LocalClientConnected_Callback;
             
-            _client.MessageReceived -= MessageReceived_Callback; 
             _client.Disconnect();
             
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+            
+            _messageProvider.Dispose();
+            _syncTimeSubscription?.Dispose();
         }
 
         public void Start()
         {
-            _client.Connect($"{_config.address}:{_config.port}", 
-                useMessageHandlers: false);
-            
             _client.MessageReceived += MessageReceived_Callback;
+            _client.Connected += LocalClientConnected_Callback;
+            _client.Connect($"{_networkConfig.address}:{_networkConfig.port}", 
+                useMessageHandlers: false);
             
             _cts = new CancellationTokenSource();
             DoUpdateAsync(_cts.Token).Forget();
         }
 
-        public void Send<T>(T message, MessageSendMode sendMode) where T : struct
-        {
-            var messageToSend = Message.Create(sendMode);
-            if (!_messageMapByType.TryGetValue(typeof(T), out var messageInfo))
-            {
-                return;
-            }
+#region MESSAGE_MANAGING
 
-            messageToSend.AddUShort(messageInfo.Key);
-            var payload = MessagePackSerializer.Serialize(message);
-            messageToSend.AddBytes(payload);
-            
+        public void Send<T>(T message, MessageSendMode sendMode) where T : struct, IMessageSerializable
+        {
+            var messageId = _messageTypeProvider.GetMessageId<T>();
+            var messageToSend = Message.Create(sendMode, messageId);
+            messageToSend.AddSerializable(message);
             _client.Send(messageToSend);
         }
+
+        public IDisposable Subscribe<T>(Action<MessageInfo<T>> callback) where T : struct, IMessageSerializable
+        {
+            return _messageProvider.Subscribe(callback);
+        }
+        
+        private void MessageReceived_Callback(object sender, MessageReceivedEventArgs args)
+        {
+            var message = args.Message;
+            Debug.Log($"Client received message: {args.MessageId}");
+            var messageType = _messageTypeProvider.GetMessageType(args.MessageId);
+            _messageProvider.Publish(messageType, message, args.FromConnection.Id);
+            message.Release();
+        }
+        
+#endregion
 
         private async UniTaskVoid DoUpdateAsync(CancellationToken ct)
         {
@@ -78,20 +98,22 @@
             }
         }
 
-        private void MessageReceived_Callback(object sender, MessageReceivedEventArgs args)
+        private void LocalClientConnected_Callback(object sender, EventArgs args)
         {
-            var message = args.Message;
-            var payloadSize = message.BytesInUse - _networkMessageConfig.MessageTypeBytes;
-            
-            message.GetBytes(_networkMessageConfig.MessageTypeBytes, _inMessageCache);
+            SyncTime().Forget();
+        }
 
-            var messageId = BitConverter.ToUInt16(_inMessageCache);
-            var messageInfo = _networkMessageConfig.Entries.FirstOrDefault(x => x.Key == messageId);
-            
-            message.GetBytes(payloadSize, _inMessageCache, _networkMessageConfig.MessageTypeBytes);
-            var messageType = messageInfo.Type.GetType();
-            
-            Publish(messageType, _inMessageCache);
+        private async UniTaskVoid SyncTime()
+        {
+            await UniTask.WaitUntil(() => _client.SmoothRTT > -1);
+            _syncTimeSubscription = Subscribe<GetTimeResponseMessage>(GetServerTimeResponse_Callback);
+            Send(new GetTimeRequestMessage(), MessageSendMode.Unreliable);
+        }
+
+        private void GetServerTimeResponse_Callback(MessageInfo<GetTimeResponseMessage> info)
+        {
+            _syncTimestamp = Time.unscaledTime - _client.SmoothRTT / 2000f;
+            _serverTime = info.Message.ServerTime;
         }
     }
 }

@@ -1,25 +1,28 @@
 ﻿namespace Runtime.Networking
 {
     using System;
-    using MessagePack;
+    using Riptide;
     using Shared;
     using UniRx;
 
-    public abstract class MessageMediatorBase<T> : IMessageMediator<T> where T : struct
+    public abstract class MessageMediatorBase<T> : IMessageMediator<T> where T : IMessageSerializable, new()
     {
-        private ReactiveCommand<T> _messageRx = new();
+        private ReactiveCommand<MessageInfo<T>> _messageRx = new();
         
         public Type MessageType => typeof(T);
 
-        public IDisposable Subscribe(Action<T> callback)
+        public IDisposable Subscribe(Action<MessageInfo<T>> callback)
         {
             return _messageRx.Subscribe(callback);
         }
         
-        public void Publish(byte[] payload)
+        public void Publish(Message message, ushort senderId)
         {
-            var message = MessagePackSerializer.Deserialize<T>(payload);
-            _messageRx.Execute(message);
+            _messageRx.Execute(new MessageInfo<T>
+            {
+                Message = message.GetSerializable<T>(),
+                SenderId = senderId
+            });
         }
 
         public void Dispose()

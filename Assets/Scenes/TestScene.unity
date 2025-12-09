@@ -617,14 +617,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 1843675741}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a0912a2281d547cfbf4b392db7e419dc, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c8602744ed1413882c0c058208fefbf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Runtime.Boot::Runtime.Boot.Bootstrap
+  m_EditorClassIdentifier: Poli.Boot::Poli.Boot.Bootstrap
   parentReference:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
-  bootConfig: {fileID: 11400000, guid: cf0757e6a08e3924e97f9260f3b5e2cc, type: 2}
+  bootConfig: {fileID: 11400000, guid: 7984a1bc094263c4689eaa924be61a6b, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -2,86 +2,94 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
     using Cysharp.Threading.Tasks;
-    using MessagePack;
     using Riptide;
     using Shared;
+    using Shared.Messages;
+    using UnityEngine;
 
-    public sealed class RiptideServer : MessageProvider, INetworkServer
+    public sealed class RiptideServer : INetworkServer
     {
         private readonly NetworkConfig _config;
-        private readonly NetworkMessageConfig _networkMessageConfig;
+        private readonly MessageTypeProvider _messageTypeProvider;
+        private readonly MessageProvider _messageProvider;
         private readonly Server _server;
 
         private CancellationTokenSource _cts;
-        private Byte[] _inMessageCache;
+        private IDisposable _timeSyncSub;
         
         private Dictionary<Type, RuntimeNetworkMessageConfigEntry> _messageMapByType;
 
-        public RiptideServer(NetworkConfig config, NetworkMessageConfig networkMessageConfig) : base(networkMessageConfig)
+        public float ServerTime => Time.unscaledTime;
+
+        public RiptideServer(MessageProvider messageProvider, MessageTypeProvider messageTypeProvider, NetworkConfig config)
         {
             _config = config;
-            _networkMessageConfig = networkMessageConfig;
-
+            _messageProvider = messageProvider;
+            _messageTypeProvider = messageTypeProvider;
+            
             _server = new Server();
-            _inMessageCache = new Byte[1024];
-            _messageMapByType = _networkMessageConfig.MapByType();
         }
-        
+
         public void Start()
         {
             _server.MessageReceived += MessageReceived_Callback;
             _server.Start(_config.port, _config.maxClients,
                 useMessageHandlers: false);
-            
 
+            _timeSyncSub = Subscribe<GetTimeRequestMessage>(GetTimeRequestMessage_Callback);
+            
             _cts = new CancellationTokenSource();
             DoUpdateAsync(_cts.Token).Forget();
         }
 
-        public override void Dispose()
+        public void Dispose()
         {
-            base.Dispose();
-            
             _server.Stop();
             _server.MessageReceived -= MessageReceived_Callback;
             
             _cts.Cancel();
             _cts.Dispose();
             _cts = null;
+
+            _messageProvider.Dispose();
+            _timeSyncSub.Dispose();
         }
         
-        public void Send<T>(T message, ushort clientId, MessageSendMode sendMode) where T : struct
+#region MESSAGE_MANAGING
+        
+        public void Send<T>(T message, ushort clientId, MessageSendMode sendMode) where T : struct, IMessageSerializable
         {
-            var messageToSend = Message.Create(sendMode);
-            if (!_messageMapByType.TryGetValue(typeof(T), out var messageInfo))
-            {
-                return;
-            }
-
-            messageToSend.AddUShort(messageInfo.Key);
-            var payload = MessagePackSerializer.Serialize(message);
-            messageToSend.AddBytes(payload);
-            
+            var messageId = _messageTypeProvider.GetMessageId<T>();
+            var messageToSend = Message.Create(sendMode, messageId);
+            messageToSend.AddSerializable(message);
             _server.Send(messageToSend, clientId);
         }
         
-        public void SendToAll<T>(T message, MessageSendMode sendMode) where T : struct
+        public void SendToAll<T>(T message, MessageSendMode sendMode) where T : struct, IMessageSerializable
         {
-            var messageToSend = Message.Create(sendMode);
-            if (!_messageMapByType.TryGetValue(typeof(T), out var messageInfo))
-            {
-                return;
-            }
-
-            messageToSend.AddUShort(messageInfo.Key);
-            var payload = MessagePackSerializer.Serialize(message);
-            messageToSend.AddBytes(payload);
-            
+            var messageId = _messageTypeProvider.GetMessageId<T>();
+            var messageToSend = Message.Create(sendMode, messageId);
+            messageToSend.AddSerializable(message);
             _server.SendToAll(messageToSend);
         }
+
+        public IDisposable Subscribe<T>(Action<MessageInfo<T>> callback) where T : struct, IMessageSerializable
+        {
+            return _messageProvider.Subscribe(callback);
+        }
+        
+        private void MessageReceived_Callback(object sender, MessageReceivedEventArgs args)
+        {
+            var message = args.Message;
+            Debug.Log($"Server received message: {args.MessageId}");
+            var messageType = _messageTypeProvider.GetMessageType(args.MessageId);
+            _messageProvider.Publish(messageType, message, args.FromConnection.Id);
+            message.Release();
+        }
+        
+#endregion
         
         private async UniTaskVoid DoUpdateAsync(CancellationToken ct)
         {
@@ -92,21 +100,16 @@
                 await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
             }
         }
-        
-        private void MessageReceived_Callback(object sender, MessageReceivedEventArgs args)
-        {
-            var message = args.Message;
-            var payloadSize = message.BytesInUse - _networkMessageConfig.MessageTypeBytes;
-            
-            message.GetBytes(_networkMessageConfig.MessageTypeBytes, _inMessageCache);
 
-            var messageId = BitConverter.ToUInt16(_inMessageCache);
-            var messageInfo = _networkMessageConfig.Entries.FirstOrDefault(x => x.Key == messageId);
+        private void GetTimeRequestMessage_Callback(MessageInfo<GetTimeRequestMessage> messageInfo)
+        {
+            var senderId = messageInfo.SenderId;
+            var responseMessage = new GetTimeResponseMessage
+            {
+                ServerTime = Time.unscaledTime
+            };
             
-            message.GetBytes(payloadSize, _inMessageCache, _networkMessageConfig.MessageTypeBytes);
-            var messageType = messageInfo.Type.GetType();
-            
-            Publish(messageType, _inMessageCache);
+            Send(responseMessage, senderId, MessageSendMode.Unreliable);
         }
     }
 }

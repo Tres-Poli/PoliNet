@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Riptide;
     using Shared;
 
     public class MessageProvider : IDisposable
@@ -18,17 +19,17 @@
             }
         }
         
-        protected void Publish(Type messageType, byte[] payload)
+        public void Publish(Type messageType, Message message, ushort senderId)
         {
             if (!_messageSubscribers.TryGetValue(messageType, out var mediator))
             {
                 return;
             }
             
-            mediator.Publish(payload);
+            mediator.Publish(message, senderId);
         }
         
-        public IDisposable Subscribe<T>(Action<T> callback) where T : struct
+        public IDisposable Subscribe<T>(Action<MessageInfo<T>> callback) where T : IMessageSerializable, new()
         {
             if (!_messageSubscribers.TryGetValue(typeof(T), out var mediator))
             {
