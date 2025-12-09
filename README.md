@@ -10,3 +10,4 @@ This is a pet project covering such aspects of game development as:
 - Code generation for ECS aspects modules and network messages;
 - ECS utilization;
 - Runtime assets management;
+- IoC container utilization;
