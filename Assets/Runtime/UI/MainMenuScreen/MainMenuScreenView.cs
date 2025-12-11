@@ -2,7 +2,7 @@
 {
     using Base;
 
-    public sealed class MainMenuView : ViewBase<MainMenuViewModel>
+    public sealed class MainMenuScreenView : ViewBase<MainMenuScreenViewModel>
     {
         
     }

@@ -1,7 +1,9 @@
 ﻿namespace Runtime.UI.Base
 {
-    public interface IScreenProvider<T> where T : IViewModel
+    using UnityEngine;
+
+    public interface IScreenProvider
     {
-        public ScreenHolder<T> GetScreen();
+        public ScreenHolder GetScreen(Transform parent);
     }
 }

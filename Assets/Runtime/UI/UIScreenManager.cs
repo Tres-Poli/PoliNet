@@ -1,37 +1,63 @@
 ﻿namespace Runtime.UI
 {
-    using System;
+    using Base;
+    using LoadingScreen;
     using MessagePipe;
     using Messaging.Messages.Application;
+    using Shared;
     using Shared.Enums;
     using UniRx;
+    using UnityEngine;
+    using VContainer;
+    using VContainer.Unity;
+    using Object = UnityEngine.Object;
 
-    public sealed class UIScreenManager : IDisposable
+    public sealed class UIScreenManager : IStartable
     {
         private CompositeDisposable _disposables;
+
+        private readonly LinearMap<UIScreenType, IScreenProvider> _providersMap;
+        private readonly UIConfig _uiConfig;
+
+        private GameObject _canvas;
+        private ScreenHolder? _currScreenHolder;
         
-        public UIScreenManager(ISubscriber<RequestUIScreenMessage> requestScreenSub)
+        [Inject]
+        public UIScreenManager(ISubscriber<RequestUIScreenMessage> requestScreenSub, LoadingScreenProvider loadingProvider, UIConfig uiConfig)
         {
-            _disposables = new CompositeDisposable();
+            _uiConfig = uiConfig;
             
-            _disposables.Add(requestScreenSub.Subscribe(RequestScreen_Callback));
+            _providersMap = LinearMap<UIScreenType, IScreenProvider>.Create();
+            _providersMap[(int)UIScreenType.Loading] = loadingProvider;
+            
+            _disposables = new CompositeDisposable();
+            _disposables.Add(requestScreenSub.Subscribe(RequestScreenMessage_Callback));
+        }
+        
+        public void Start()
+        {
+            _canvas = Object.Instantiate(_uiConfig.CanvasPrefab);
         }
         
         public void Dispose()
         {
+            if (_currScreenHolder.HasValue)
+            {
+                _currScreenHolder.Value.Dispose();
+            }
+            
             _disposables.Dispose();
+            _disposables = null;
         }
 
-        private void RequestScreen_Callback(RequestUIScreenMessage message)
+        private void RequestScreenMessage_Callback(RequestUIScreenMessage message)
         {
-            switch (message.ScreenType)
+            if (_currScreenHolder.HasValue)
             {
-                case UIScreenType.Default:
-                    break;
-                
-                case UIScreenType.Loading:
-                    break;
+                _currScreenHolder.Value.Dispose();
             }
+            
+            _currScreenHolder = _providersMap[(int)message.ScreenType].GetScreen(_canvas.transform);
         }
     }
 }

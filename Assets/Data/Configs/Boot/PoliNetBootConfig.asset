@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Runtime.Boot::Runtime.Boot.PoliNetBootConfig
   _networkType: 3
   _common:
-    loaders:
-    - {fileID: 11400000, guid: 4b9aebddb622b7941b4a6787f7ec49c8, type: 2}
+    loaders: []
   _client:
     loaders:
+    - {fileID: 11400000, guid: 4448d024390289445b5937b492a5f022, type: 2}
     - {fileID: 11400000, guid: 9a299cd300b4f834ab73b37483d43eb2, type: 2}
+    - {fileID: 11400000, guid: 59c034994d16b324dbcc30ac550e3184, type: 2}
+    - {fileID: 11400000, guid: d82ba23fedb5a3949a1ef6babf4af137, type: 2}
   _server:
     loaders:
     - {fileID: 11400000, guid: 4b9aebddb622b7941b4a6787f7ec49c8, type: 2}

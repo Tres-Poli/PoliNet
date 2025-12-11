@@ -1,6 +1,7 @@
 ﻿namespace Runtime.Messaging
 {
     using MessagePipe;
+    using Messages.Application;
     using Poli.Boot;
     using UnityEngine;
     using VContainer;
@@ -13,8 +14,8 @@
         {
             var options = builder.RegisterMessagePipe();
             builder.RegisterBuildCallback(c => GlobalMessagePipe.SetProvider(c.AsServiceProvider()));
-            
-            //builder.RegisterMessageBroker<int>(options);
+
+            builder.RegisterMessageBroker<RequestUIScreenMessage>(options);
         }
     }
 }

@@ -5,10 +5,10 @@
 
     public abstract class ClientStateBase : IState
     {
-        private readonly ReactiveCommand<int> _onNext = new();
+        private readonly ReactiveCommand<ClientStateType> _onNext = new();
         
         public int StateType => (int)ClientStateType;
-        public ReactiveCommand<int> OnNext => _onNext;
+        public ReactiveCommand<ClientStateType> OnNext => _onNext;
         
         public abstract ClientStateType ClientStateType { get; }
         
@@ -23,7 +23,7 @@
 
         protected void Next(ClientStateType value)
         {
-            _onNext.Execute((int)value);
+            _onNext.Execute(value);
         }
     }
 }

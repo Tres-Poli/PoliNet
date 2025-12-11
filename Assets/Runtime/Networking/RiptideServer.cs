@@ -30,6 +30,7 @@
             _messageTypeProvider = messageTypeProvider;
             
             _server = new Server();
+            Start();
         }
 
         public void Start()

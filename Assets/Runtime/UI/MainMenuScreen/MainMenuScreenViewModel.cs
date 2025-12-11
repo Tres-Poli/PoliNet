@@ -2,7 +2,7 @@
 {
     using Base;
 
-    public sealed class MainMenuViewModel : IViewModel
+    public sealed class MainMenuScreenViewModel : IViewModel
     {
         public void Dispose()
         {

@@ -26,12 +26,12 @@
             var loaders = new List<ILoader>();
             loaders.Add(_common);
             
-            if (BitMaskHelper.HasBit(_networkType, NetworkType.Client))
+            if (BitMaskHelper.HasBit((int)_networkType, (int)NetworkType.Client))
             {
                 loaders.Add(_client);
             }
 
-            if (BitMaskHelper.HasBit(_networkType, NetworkType.Server))
+            if (BitMaskHelper.HasBit((int)_networkType, (int)NetworkType.Server))
             {
                 loaders.Add(_server);
             }

@@ -2,7 +2,11 @@
 {
     using System;
 
-    public interface IView<T> : IDisposable where T : IViewModel
+    public interface IView : IDisposable
+    {
+    }
+    
+    public interface IView<T> : IView where T : IViewModel
     {
         public void Initialize(T viewModel);
     }
